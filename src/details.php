@@ -203,11 +203,50 @@ try {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    // Function to show the popup
+    function showPopup() {
+        const overlay = document.getElementById('overlay');
+        const popupContent = document.getElementById('popupContent');
+        const eventDetailsDiv = document.getElementById('eventDetails');
+
+        // Set the event details in the popup
+        const eventTitle = "<?php echo $result['titre']; ?>";
+        const eventDescription = "<?php echo $result['description']; ?>";
+        const eventPrice1 = document.getElementById('tariff1').value * 50;
+        const eventPrice2 = document.getElementById('tariff2').value * 100;
+        const totalPrice = eventPrice1 + eventPrice2;
+
+        eventDetailsDiv.innerHTML = `<p>Title: ${eventTitle}</p><p>Description: ${eventDescription}</p><p>Total Price: $${totalPrice}</p>`;
+
+        // Show the overlay and popup
+        overlay.style.display = 'flex';
+        popupContent.style.display = 'block';
+    }
+
+    // Function to close the popup
+    function closePopup() {
+        const overlay = document.getElementById('overlay');
+        const popupContent = document.getElementById('popupContent');
+
+        // Hide the overlay and popup
+        overlay.style.display = 'none';
+        popupContent.style.display = 'none';
+    }
+
+    // Function to confirm purchase
+    function confirmPurchase() {
+        // Here you can add logic to submit the purchase form or any other action you need
+        // For example, you can redirect to a purchase processing page
+        window.location.href = "purchase_process.php";
+    }
+
+    // Function to redirect to login page
+    function redirectToLogin() {
+        window.location.href = "Loginpage.php";
+    }
 
 
 
-
-    
     function submit() {
         document.getElementById("editProfail").submit();
     }

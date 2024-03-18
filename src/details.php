@@ -141,6 +141,8 @@ try {
                 }
             } else {
                 // Display Sold out button if tickets are sold out
+                                // Display Sold out button if tickets are sold out
+
                 echo "<button class='button bg-secondary text-white' type='button' disabled>Sold out</button>";
             }
             ?>

@@ -31,6 +31,29 @@ try {
     <title>Event Detail Page</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet" />
+    <style>
+        /* Add your CSS styles here */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .popup {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -90,6 +113,7 @@ try {
         </div>
     </nav>
 
+    <!-- Your existing HTML content -->
     <div class="event-container">
         <div class="event-image-container">
             <div class="overlay"></div>
@@ -106,22 +130,33 @@ try {
                 <input type="number" id="tariff2" class="tariff-input" min="0" value="0">
             </div>
 
-
-
             <?php
             if ($CountTickets < $CapacityRoom) {
                 if ($userLoggedIn) {
-                    echo "<form action='purchase_process.php' method='POST'>";
-                    echo "<input type='hidden' name='event_id' value='" . $result['numVersion'] . "'>";
-                    echo "<button type='submit' name='buy'>Buy Tickets</button>";
-                    echo "</form>";
+                    // Display Buy Tickets button with onclick event to show popup
+                    echo "<button onclick='showPopup()'>Buy Tickets</button>";
                 } else {
+                    // Display Login button with onclick event to redirect to login page
                     echo "<button onclick='redirectToLogin()'>Login to Buy Tickets</button>";
                 }
             } else {
+                // Display Sold out button if tickets are sold out
                 echo "<button class='button bg-secondary text-white' type='button' disabled>Sold out</button>";
             }
             ?>
+        </div>
+    </div>
+
+    <!-- Fullscreen overlay -->
+    <div class="fullscreen-overlay" id="overlay">
+        <!-- Popup content -->
+        <div class="popup" id="popupContent">
+            <h2>Confirm Purchase</h2>
+            <div id="eventDetails">
+                <!-- Event details will be filled here dynamically -->
+            </div>
+            <button onclick="closePopup()">Cancel</button>
+            <button onclick="confirmPurchase()">Confirm</button>
         </div>
     </div>
 
@@ -168,6 +203,50 @@ try {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    // Function to show the popup
+    function showPopup() {
+        const overlay = document.getElementById('overlay');
+        const popupContent = document.getElementById('popupContent');
+        const eventDetailsDiv = document.getElementById('eventDetails');
+
+        // Set the event details in the popup
+        const eventTitle = "<?php echo $result['titre']; ?>";
+        const eventDescription = "<?php echo $result['description']; ?>";
+        const eventPrice1 = document.getElementById('tariff1').value * 50;
+        const eventPrice2 = document.getElementById('tariff2').value * 100;
+        const totalPrice = eventPrice1 + eventPrice2;
+
+        eventDetailsDiv.innerHTML = `<p>Title: ${eventTitle}</p><p>Description: ${eventDescription}</p><p>Total Price: $${totalPrice}</p>`;
+
+        // Show the overlay and popup
+        overlay.style.display = 'flex';
+        popupContent.style.display = 'block';
+    }
+
+    // Function to close the popup
+    function closePopup() {
+        const overlay = document.getElementById('overlay');
+        const popupContent = document.getElementById('popupContent');
+
+        // Hide the overlay and popup
+        overlay.style.display = 'none';
+        popupContent.style.display = 'none';
+    }
+
+    // Function to confirm purchase
+    function confirmPurchase() {
+        // Here you can add logic to submit the purchase form or any other action you need
+        // For example, you can redirect to a purchase processing page
+        window.location.href = "purchase_process.php";
+    }
+
+    // Function to redirect to login page
+    function redirectToLogin() {
+        window.location.href = "Loginpage.php";
+    }
+
+
+
     function submit() {
         document.getElementById("editProfail").submit();
     }

@@ -1,7 +1,5 @@
 <?php
 session_start();
-
-// echo $_SESSION['user_id'];
 require_once 'connection.php';
 
 if (isset($_GET['search'])) {

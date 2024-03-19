@@ -2,38 +2,36 @@
 session_start();
 require_once 'connection.php';
 
-if (isset($_GET['search'])) {
-    $search = '%' . $_GET['search'] . '%';
-    $Sql = "SELECT titre, dateEvenement, image, numVersion 
-            FROM evenement
-            INNER JOIN version ON evenement.idEvenement = version.idEvenement
-            WHERE (titre LIKE :search OR dateEvenement BETWEEN :startdate AND :enddate)";
+try {
+    if (isset($_GET['search'])) {
+        $search = '%' . $_GET['search'] . '%';
+        $Sql = "SELECT titre, dateEvenement, image, numVersion 
+                FROM evenement 
+                INNER JOIN version  ON evenement.idEvenement = version.idEvenement
+                WHERE titre LIKE :search OR dateEvenement BETWEEN :startdate AND :enddate";
 
-    try {
         $result = $DATABASE->prepare($Sql);
         $result->bindParam(':search', $search);
         $result->bindValue(':startdate', $_GET['start-date']);
         $result->bindValue(':enddate', $_GET['end-date']);
         $result->execute();
         $lines = $result->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $error) {
-        echo 'error is : ' . $error->getMessage();
-    }
-} else {
-    try {
+    } else {
         $currentTime = date("Y-m-d H:i:s");
-        $Sql = "SELECT titre, image, dateEvenement, categorie, numVersion, FROM evenement 
-                INNER JOIN version ON evenement.idEvenement = version.idEvenement
-                where dateEvenement >= :currentTime
-                order by dateEvenement, titre";
+        $Sql = "SELECT titre, image, dateEvenement, categorie, numVersion 
+                FROM evenement 
+                INNER JOIN version  ON evenement.idEvenement = version.idEvenement
+                WHERE dateEvenement >= :currentTime
+                ORDER BY dateEvenement, titre";
         $result = $DATABASE->prepare($Sql);
         $result->bindParam(':currentTime', $currentTime);
         $result->execute();
         $lines = $result->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $errorr) {
-        echo 'error is : ' . $errorr->getMessage();
     }
+} catch (PDOException $error) {
+    echo 'Error: ' . $error->getMessage();
 }
+
 
 
 
@@ -185,7 +183,8 @@ if (isset($_GET['search'])) {
                 $CountTickts = CountTickts($numVersion, $DATABASE);
                 ?>
                 <div class="popular__card">
-                    <img src="/image/<?php echo $row['image']; ?>" alt="" />
+                   
+                    <img src="../image/<?php echo $row['image']; ?>" alt="Event Image" />
                     <div class="popular__content">
                         <div class="popular__card__header">
                             <h4><?php echo $row['titre']; ?></h4>

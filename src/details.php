@@ -2,38 +2,23 @@
 session_start();
 require_once 'connection.php';
 
-if (isset($_GET['search'])) {
-    $search = '%' . $_GET['search'] . '%';
-    $Sql = "SELECT titre, dateEvenement, image, numVersion 
-            FROM evenement
-            INNER JOIN version ON evenement.idEvenement = version.idEvenement
-            WHERE titre LIKE :search OR dateEvenement BETWEEN :startdate AND :enddate";
-
+if (isset($_GET['numVersion'])) {
     try {
-        $result = $DATABASE->prepare($Sql);
-        $result->bindParam(':search', $search);
-        $result->bindValue(':startdate', $_GET['start-date']);
-        $result->bindValue(':enddate', $_GET['end-date']);
-        $result->execute();
-        $lines = $result->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $error) {
-        echo 'error is : ' . $error->getMessage();
-    }
-} else {
-    try {
-        $currentTime = date("Y-m-d H:i:s");
-        $Sql = "SELECT titre, image, dateEvenement, categorie, numVersion FROM evenement 
+        $numVersion = $_GET['numVersion'];
+        $sql = "SELECT * 
+                FROM evenement 
                 INNER JOIN version ON evenement.idEvenement = version.idEvenement
-                WHERE dateEvenement >= :currentTime
-                ORDER BY dateEvenement, titre";
-        $result = $DATABASE->prepare($Sql);
-        $result->bindParam(':currentTime', $currentTime);
+                WHERE numVersion = :numVersion";
+        $result = $DATABASE->prepare($sql);
+        $result->bindParam(':numVersion', $numVersion, PDO::PARAM_INT); // Assuming numVersion is an integer
         $result->execute();
-        $lines = $result->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $errorr) {
-        echo 'error is : ' . $errorr->getMessage();
+        $row = $result->fetch(PDO::FETCH_ASSOC);
+
+    
+    } catch (PDOException $error) {
+        echo 'Error: ' . $error->getMessage();
     }
-}
+} 
 
 ?>
 
@@ -182,19 +167,22 @@ if (isset($_GET['search'])) {
 
     <div class="event-container">
         <div class="event-image-container">
-            <img class="event-image" src="image/<?php echo $result['image']; ?>" alt="Event Image">
+            <!-- Display event image -->
+            <img class="event-image" src="../image/<?php echo $row['image']; ?>" alt="Event Image">
         </div>
         <div class="event-content">
-            <h1><?php echo $result['titre'] ?></h1>
-            <p><?php echo $result['description'] ?></p>
+            <!-- Display event details -->
+            <h1><?php echo $row['titre'] ?></h1>
+            <p><?php echo $row['description'] ?></p>
+            <!-- Ticket tariffs and purchase button -->
             <div class="tariffs">
+                <!-- Input fields for ticket quantities -->
                 <label for="tariff1">Tariff Reduit: $50</label>
                 <input type="number" id="tariff1" class="tariff-input" min="0" value="0">
-
                 <label for="tariff2">Tariff Normal: $100</label>
                 <input type="number" id="tariff2" class="tariff-input" min="0" value="0">
             </div>
-
+            <!-- Purchase button -->
             <?php
             if ($CountTickets < $CapacityRoom) {
                 if ($userLoggedIn) {
@@ -327,7 +315,7 @@ if (isset($_GET['search'])) {
 
     // Function to confirm purchase
     function confirmPurchase() {
-    
+
         window.location.href = "purchase_process.php";
     }
 

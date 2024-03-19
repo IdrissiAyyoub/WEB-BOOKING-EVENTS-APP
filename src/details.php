@@ -2,24 +2,39 @@
 session_start();
 require_once 'connection.php';
 
-try {
-    if (isset($_GET['details'])) {
-        $numVersion = $_GET['numVersion'];
-        $sql = "SELECT titre, description, dateEvenement, categorie, image, numVersion FROM evenement
-                INNER JOIN version ON evenement.idEvenement = version.idEvenement
-                WHERE numVersion = :numVersion";
-        $stmt = $DATABASE->prepare($sql);
-        $stmt->bindParam(':numVersion', $numVersion);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $CapacityRoom = CapacityRoom($numVersion, $DATABASE);
-        $CountTickets = CountTickts($numVersion, $DATABASE);
-    }
+if (isset($_GET['search'])) {
+    $search = '%' . $_GET['search'] . '%';
+    $Sql = "SELECT titre, dateEvenement, image, numVersion 
+            FROM evenement
+            INNER JOIN version ON evenement.idEvenement = version.idEvenement
+            WHERE titre LIKE :search OR dateEvenement BETWEEN :startdate AND :enddate";
 
-    $userLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true;
-} catch (PDOException $error) {
-    echo 'error is: ' . $error->getMessage();
+    try {
+        $result = $DATABASE->prepare($Sql);
+        $result->bindParam(':search', $search);
+        $result->bindValue(':startdate', $_GET['start-date']);
+        $result->bindValue(':enddate', $_GET['end-date']);
+        $result->execute();
+        $lines = $result->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $error) {
+        echo 'error is : ' . $error->getMessage();
+    }
+} else {
+    try {
+        $currentTime = date("Y-m-d H:i:s");
+        $Sql = "SELECT titre, image, dateEvenement, categorie, numVersion FROM evenement 
+                INNER JOIN version ON evenement.idEvenement = version.idEvenement
+                WHERE dateEvenement >= :currentTime
+                ORDER BY dateEvenement, titre";
+        $result = $DATABASE->prepare($Sql);
+        $result->bindParam(':currentTime', $currentTime);
+        $result->execute();
+        $lines = $result->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $errorr) {
+        echo 'error is : ' . $errorr->getMessage();
+    }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -202,6 +217,7 @@ try {
         <!-- Popup content -->
         <div class="popup" id="popupContent">
             <h2>Confirm Purchase</h2>
+            <h4><?php echo $result['titre'] ?></h4>
             <table class="ticket-table">
                 <thead>
                     <tr>
@@ -311,8 +327,7 @@ try {
 
     // Function to confirm purchase
     function confirmPurchase() {
-        // Here you can add logic to submit the purchase form or any other action you need
-        // For example, you can redirect to a purchase processing page
+    
         window.location.href = "purchase_process.php";
     }
 
@@ -321,9 +336,7 @@ try {
         window.location.href = "Loginpage.php";
     }
 
-
-
-
+    // Menu toggle functionality
     const navBar = document.querySelector("nav"),
         menuBtns = document.querySelectorAll(".menu-icon"),
         overlay = document.querySelector(".overlay");

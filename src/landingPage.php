@@ -22,7 +22,7 @@ if (isset($_GET['search'])) {
 } else {
     try {
         $currentTime = date("Y-m-d H:i:s");
-        $Sql = "SELECT titre, dateEvenement, image, categorie, numVersion FROM evenement 
+        $Sql = "SELECT titre, image, dateEvenement, categorie, numVersion, FROM evenement 
                 INNER JOIN version ON evenement.idEvenement = version.idEvenement
                 where dateEvenement >= :currentTime
                 order by dateEvenement, titre";
@@ -185,7 +185,7 @@ if (isset($_GET['search'])) {
                 $CountTickts = CountTickts($numVersion, $DATABASE);
                 ?>
                 <div class="popular__card">
-                    <img src="image/<?php echo $row['image']; ?>" alt="" />
+                    <img src="/image/<?php echo $row['image']; ?>" alt="" />
                     <div class="popular__content">
                         <div class="popular__card__header">
                             <h4><?php echo $row['titre']; ?></h4>

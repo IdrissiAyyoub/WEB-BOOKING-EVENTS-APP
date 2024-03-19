@@ -1,6 +1,15 @@
 <?php
 session_start();
 require_once 'connection.php';
+// Check if the session variable user_id exists
+if (isset($_SESSION['user_id'])) {
+    // User is logged in
+    $userLoggedIn = true;
+} else {
+    // User is not logged in
+    $userLoggedIn = false;
+}
+
 
 if (isset($_GET['numVersion'])) {
     try {
@@ -14,11 +23,13 @@ if (isset($_GET['numVersion'])) {
         $result->execute();
         $row = $result->fetch(PDO::FETCH_ASSOC);
 
-    
+        // Get CapacityRoom and CountTickets if needed
+        $CapacityRoom = CapacityRoom($numVersion, $DATABASE);
+        $CountTickets = CountTickts($numVersion, $DATABASE);
     } catch (PDOException $error) {
         echo 'Error: ' . $error->getMessage();
     }
-} 
+}
 
 ?>
 
@@ -166,13 +177,13 @@ if (isset($_GET['numVersion'])) {
     </nav>
 
     <div class="event-container">
-        <div class="event-image-container">
-            <!-- Display event image -->
-            <img class="event-image" src="../image/<?php echo $row['image']; ?>" alt="Event Image">
-        </div>
+        <!-- Event details -->
         <div class="event-content">
+
             <!-- Display event details -->
             <h1><?php echo $row['titre'] ?></h1>
+            <img class="event-image" src="../image/<?php echo $row['image']; ?>" alt="Event Image">
+            <h3>Description</h3>
             <p><?php echo $row['description'] ?></p>
             <!-- Ticket tariffs and purchase button -->
             <div class="tariffs">
@@ -184,17 +195,18 @@ if (isset($_GET['numVersion'])) {
             </div>
             <!-- Purchase button -->
             <?php
-            if ($CountTickets < $CapacityRoom) {
-                if ($userLoggedIn) {
+            // Check if the user is logged in
+            if ($userLoggedIn) {
+                if ($CountTickets < $CapacityRoom) {
                     // Display Buy Tickets button with onclick event to show popup
                     echo "<button onclick='showPopup()'>Buy Tickets</button>";
                 } else {
-                    // Display Login button with onclick event to redirect to login page
-                    echo "<button onclick='redirectToLogin()'>Login to Buy Tickets</button>";
+                    // Display Sold out button if tickets are sold out
+                    echo "<button class='button bg-secondary text-white' type='button' disabled>Sold out</button>";
                 }
             } else {
-                // Display Sold out button if tickets are sold out
-                echo "<button class='button bg-secondary text-white' type='button' disabled>Sold out</button>";
+                // Display Login button with onclick event to redirect to login page
+                echo "<button onclick='redirectToLogin()'>Login to Buy Tickets</button>";
             }
             ?>
         </div>
@@ -205,7 +217,7 @@ if (isset($_GET['numVersion'])) {
         <!-- Popup content -->
         <div class="popup" id="popupContent">
             <h2>Confirm Purchase</h2>
-            <h4><?php echo $result['titre'] ?></h4>
+            <h4><?php echo $row['titre'] ?></h4>
             <table class="ticket-table">
                 <thead>
                     <tr>
@@ -270,6 +282,7 @@ if (isset($_GET['numVersion'])) {
             Copyright © 2024 Web Design Ayyoub. All rights reserved.
         </div>
     </footer>
+
 
     <script>
         function redirectToLogin() {

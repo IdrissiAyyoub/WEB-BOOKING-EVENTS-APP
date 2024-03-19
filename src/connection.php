@@ -30,4 +30,4 @@ function CountTickts($numVersion, $DATABASE)
     $stmBillet->execute();
     $rowBillet = $stmBillet -> fetch(PDO::FETCH_ASSOC);
     return $rowBillet['count'];
-}
+}                      

@@ -310,6 +310,8 @@ if (isset($_GET['numVersion'])) {
         document.getElementById('totalPrice').textContent = '$' + totalPrice;
 
         // Show the overlay and popup
+        // Show the overlay and popup
+
         overlay.style.display = 'flex';
         popupContent.style.display = 'block';
     }

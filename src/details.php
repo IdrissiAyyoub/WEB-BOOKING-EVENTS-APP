@@ -193,7 +193,6 @@ if (isset($_GET['numVersion'])) {
                 <label for="tariff2">Tariff Normal: $100</label>
                 <input type="number" id="tariff2" class="tariff-input" min="0" value="0">
             </div>
-            <!-- Purchase button -->
             <?php
             // Check if the user is logged in
             if ($userLoggedIn) {
@@ -212,7 +211,6 @@ if (isset($_GET['numVersion'])) {
         </div>
     </div>
 
-    <!-- Fullscreen overlay -->
     <div class="fullscreen-overlay" id="overlay">
         <!-- Popup content -->
         <div class="popup" id="popupContent">

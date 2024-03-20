@@ -179,7 +179,6 @@ if (isset($_GET['numVersion'])) {
     <div class="event-container">
         <!-- Event details -->
         <div class="event-content">
-
             <!-- Display event details -->
             <h1><?php echo $row['titre'] ?></h1>
             <img class="event-image" src="../image/<?php echo $row['image']; ?>" alt="Event Image">
@@ -196,9 +195,10 @@ if (isset($_GET['numVersion'])) {
             <?php
             // Check if the user is logged in
             if ($userLoggedIn) {
-                if ($CountTickets < $CapacityRoom) {
+                // Check if the Buy Tickets button should be enabled based on available capacity
+                if ($CapacityRoom > 0) {
                     // Display Buy Tickets button with onclick event to show popup
-                    echo "<button onclick='showPopup()'>Buy Tickets</button>";
+                    echo "<button onclick='checkCapacity()'>Buy Tickets</button>";
                 } else {
                     // Display Sold out button if tickets are sold out
                     echo "<button class='button bg-secondary text-white' type='button' disabled>Sold out</button>";
@@ -210,6 +210,7 @@ if (isset($_GET['numVersion'])) {
             ?>
         </div>
     </div>
+
 
     <div class="fullscreen-overlay" id="overlay">
         <!-- Popup content -->
@@ -292,6 +293,23 @@ if (isset($_GET['numVersion'])) {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    function checkCapacity() {
+        // Get the values of the ticket quantities
+        var tariff1Quantity = parseInt(document.getElementById('tariff1').value);
+        var tariff2Quantity = parseInt(document.getElementById('tariff2').value);
+        // Calculate the total number of tickets
+        var totalTickets = tariff1Quantity + tariff2Quantity;
+        // Check if the total number of tickets exceeds the capacity of the room
+        if (totalTickets > <?php echo $CapacityRoom; ?>) {
+            // Show an alert message indicating not enough places available
+            alert("Sorry, there are not enough places available. Please choose fewer tickets.");
+        } else {
+            // Proceed to the purchase process page
+            showPopup();
+        }
+    }
+
+
     // Function to show the popup
     function showPopup() {
         const overlay = document.getElementById('overlay');
@@ -309,7 +327,6 @@ if (isset($_GET['numVersion'])) {
         document.getElementById('totalPrice2').textContent = '$' + totalPrice2;
         document.getElementById('totalPrice').textContent = '$' + totalPrice;
 
-        // Show the overlay and popup
         // Show the overlay and popup
 
         overlay.style.display = 'flex';
